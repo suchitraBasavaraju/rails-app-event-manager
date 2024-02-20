@@ -1,13 +1,13 @@
 # README
 
 * Ruby version
-  V3.3.0
+  - V3.3.0
 
 * Database creation
-  rails db:create
+  - rails db:create
 
 * How to run the test suite
-  rails spec
+  - rails spec
 
 * Steps
 - Make a copy for .env.to_set to .env and set the environment variables
