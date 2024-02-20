@@ -19,14 +19,27 @@ class EventsController < ApplicationController
   end
 
   def send_email_notifications
-    responses =[]
-    events_b = Event.where(event_type: 'B')
-    events_b.each do |event|
-      response = IterableService.send_email_notification(event.user_id.to_s, "subject", "body")
-      responses << response
-    end
+    responses = []
+    begin
+      events_b = Event.where(event_type: 'B')
+      events_b.each do |event|
+        body = {
+          campaignId: 0,
+          recipientEmail: "string",
+          recipientUserId: event.user_id.to_s,
+          dataFields: { favoriteColor: "red" },
+          sendAt: "string",
+          allowRepeatMarketingSends: true,
+          metadata: {}
+        }
+        response = IterableService.send_email_notification(body)
+        responses << response
+      end
       flash[:success] = responses
-    redirect_to root_path
+    rescue StandardError => e
+      flash[:error] = "Error sending email notifications: #{e.message}"
+    ensure
+      redirect_to root_path
+    end
   end
-
 end
