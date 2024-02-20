@@ -8,23 +8,10 @@ class EventsController < ApplicationController
     user = current_user
     Event.create(name: "Event A", user_id: user.id, event_type: "A")
 
-    url = ENV['ITERABLE_IO_URL']
-    api_key = ENV['ITERABLE_IO_API_KEY']
-    iterable_io_url = "#{url}/api/events/trackWebPushClick"
-    body = {
-      "email": current_user.email,
-      "messageId": "Event A",
-    }
-    begin
-      event_a_response = HTTParty.post(iterable_io_url, body: body.to_json, headers: {
-        Authorization: "Bearer #{api_key}", 'Content-Type' => 'application/json'
-      })
+    event_a_response = IterableService.web_push_event("Event A", current_user.email)
 
-      render json: { message: event_a_response }, status: :ok
+    render json: { message: event_a_response }, status: :ok
 
-    rescue HTTParty::Error, StandardError => e
-      render json: { error: "HTTP POST request to Iterable IO failed. #{e.message}" }, status: :unprocessable_entity
-    end
   end
 
   def create_event_b
@@ -57,5 +44,21 @@ class EventsController < ApplicationController
     ensure
       redirect_to root_path
     end
+  end
+
+  private
+
+  def web_pust_event(event_type, email)
+    url = ENV['ITERABLE_IO_URL']
+    api_key = ENV['ITERABLE_IO_API_KEY']
+    iterable_io_url = "#{url}/api/events/trackWebPushClick"
+    body = {
+      "email": email,
+      "messageId": event_type,
+    }
+    event_response = HTTParty.post(iterable_io_url, body: body.to_json, headers: {
+      Authorization: "Bearer #{api_key}", 'Content-Type' => 'application/json'
+    })
+    return event_response
   end
 end
