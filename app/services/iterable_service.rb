@@ -9,11 +9,8 @@ class IterableService
       "recipientEmail": email,
     }
 
-    event_response = HTTParty.post(email_target_url, body: body.to_json, headers: {
-      Authorization: "Bearer #{api_key}", 'Content-Type' => 'application/json'
-    })
+    event_response = post_request(api_key, body, email_target_url)
     return event_response
-
   end
 
   def self.web_push_event(event_type,email)
@@ -21,13 +18,19 @@ class IterableService
     api_key = ENV['ITERABLE_IO_API_KEY']
     web_push_url = "#{url}/api/events/trackWebPushClick"
     body = {
-      "email": email ,
+      "email": email,
       "messageId": event_type,
     }
-    event_response = HTTParty.post(web_push_url, body: body.to_json, headers: {
+    event_response = post_request(api_key, body, web_push_url)
+    return event_response
+  end
+
+  private
+
+  def self.post_request(api_key, body, email_target_url)
+    HTTParty.post(email_target_url, body: body.to_json, headers: {
       Authorization: "Bearer #{api_key}", 'Content-Type' => 'application/json'
     })
-    return event_response
   end
 
 end
