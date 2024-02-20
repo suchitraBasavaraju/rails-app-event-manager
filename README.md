@@ -1,24 +1,15 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
 * Ruby version
-
-* System dependencies
-
-* Configuration
+  V3.3.0
 
 * Database creation
-
-* Database initialization
+  rails db:create
 
 * How to run the test suite
+  rails spec
 
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+* Steps
+- Make a copy for .env.to_set to .env and set the environment variables
+- Run rails db:create db:migrate
+- Run rails server
