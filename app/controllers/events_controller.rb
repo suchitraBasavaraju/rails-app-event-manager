@@ -7,8 +7,24 @@ class EventsController < ApplicationController
   def create_event_a
     user = current_user
     Event.create(name: "Event A", user_id: user.id, event_type: "A")
-    flash[:success] = 'Event A created!'
-    redirect_to root_path
+
+    url = ENV['ITERABLE_IO_URL']
+    api_key = ENV['ITERABLE_IO_API_KEY']
+    iterable_io_url = "#{url}/api/events/trackWebPushClick"
+    body = {
+      "email": current_user.email,
+      "messageId": "Event A",
+    }
+    begin
+      event_a_response = HTTParty.post(iterable_io_url, body: body.to_json, headers: {
+        Authorization: "Bearer #{api_key}", 'Content-Type' => 'application/json'
+      })
+
+      render json: { message: event_a_response }, status: :ok
+
+    rescue HTTParty::Error, StandardError => e
+      render json: { error: "HTTP POST request to Iterable IO failed. #{e.message}" }, status: :unprocessable_entity
+    end
   end
 
   def create_event_b

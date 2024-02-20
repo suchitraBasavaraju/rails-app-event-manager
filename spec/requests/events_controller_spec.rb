@@ -1,25 +1,30 @@
 require 'rails_helper'
+require 'webmock/rspec'
 
 RSpec.describe "EventsControllers", type: :request do
 
   let(:user) { create(:user) }
   before do
+    Dotenv.load('.env')
+    ENV['ITERABLE_IO_API_KEY'] = 'test-api-key'
     sign_in user
+
   end
 
   describe "POST #create_event_a" do
 
-    it "creates an Event A and redirects to root_path" do
-      expect {
-        post "/events/create_event_a"
-      }.to change(Event, :count).by(1)
+    it "creates an Event A" do
+      url = /api\/events\/trackWebPushClick/
+      WebMock.stub_request(:post, url).to_return(status: 200, body: `{ "msg" : "Event A" }`, headers: {})
 
-      expect(flash[:success]).to eq('Event A created!')
-      expect(response).to redirect_to(root_path)
-      expect(Event.first.name).to eq("Event A")
-      expect(Event.first.user_id).to eq(user.id)
-      expect(Event.first.event_type).to eq("A")
+      post "/events/create_event_a"
+
+      expect(WebMock).to have_requested(:post, url).with(
+        headers: { 'Authorization' => "Bearer test-api-key" ,'Content-Type'=>'application/json'},
+        body: '{"email":"user@example.com","messageId":"Event A"}'
+      ).once
     end
+
   end
 
   describe "POST #create_event_b" do
