@@ -43,8 +43,15 @@ class IterableService
   private
 
   def self.initialize
+    if Rails.env.development? || Rails.env.test?
+      print("Inside development environment")
+      @url = ENV['ITERABLE_IO_MOCK_URL']
+      @api_key = ENV['ITERABLE_IO_API_KEY']
+      return
+    end
     @url = ENV['ITERABLE_IO_URL']
     @api_key = ENV['ITERABLE_IO_API_KEY']
+
   end
 
   def self.post_request(api_key, body, target_url)

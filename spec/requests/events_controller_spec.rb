@@ -27,7 +27,7 @@ RSpec.describe "EventsControllers", type: :request do
   end
 
   describe '#create_event_b and send email' do
-    it 'creates Event B and sends email successfully' do
+    it 'creates Event B and sends email notification successfully' do
       allow(IterableService).to receive(:track_event).and_return("Event A tracked successfully") # Mocking IterableService
       allow(IterableService).to receive(:send_email_notification).and_return("Email Sent successfully") # Mocking IterableService
 
@@ -36,7 +36,7 @@ RSpec.describe "EventsControllers", type: :request do
       expect(flash[:success]).to eq("Event A tracked successfully - Email Sent successfully")
     end
 
-    it 'sets error when track_event raises error' do
+    it 'sets error when event creation raises error' do
       allow(IterableService).to receive(:track_event).and_raise(StandardError, 'event error message')
       allow(IterableService).to receive(:send_email_notification).and_raise(StandardError, 'Email error message')
 
@@ -46,7 +46,7 @@ RSpec.describe "EventsControllers", type: :request do
       expect(flash[:error]).to eq('event error message')
     end
 
-    it 'sets error when send_email_notification raises error' do
+    it 'sets error when email notification raises error' do
       allow(IterableService).to receive(:track_event).and_return("Event A tracked successfully") # Mocking IterableService
       allow(IterableService).to receive(:send_email_notification).and_raise(StandardError,"Email send error") # Mocking IterableService
 

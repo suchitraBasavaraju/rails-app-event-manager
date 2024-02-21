@@ -13,6 +13,7 @@ class EventsController < ApplicationController
     rescue StandardError => e
       flash[:error] = "#{e.message}"
     end
+    redirect_to root_path
   end
 
   def create_event_b
@@ -26,6 +27,7 @@ class EventsController < ApplicationController
     rescue StandardError => e
       flash[:error] = "#{e.message}"
     end
+    redirect_to root_path
   end
 
 end
