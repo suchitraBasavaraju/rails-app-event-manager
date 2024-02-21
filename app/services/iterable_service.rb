@@ -44,7 +44,6 @@ class IterableService
 
   def self.initialize
     if Rails.env.development? || Rails.env.test?
-      print("Inside development environment")
       @url = ENV['ITERABLE_IO_MOCK_URL']
       @api_key = ENV['ITERABLE_IO_API_KEY']
       return

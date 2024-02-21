@@ -11,5 +11,9 @@
 
 * Steps
 - Make a copy for .env.to_set to .env and set the environment variables
+- Note: iterable io api requests are mocked using https://app.wiremock.cloud/
+- Set ITERABLE_IO_MOCK_URL='https://q947l.wiremockapi.cloud' for mocked response in .env. Below APIs are mocked
+  Track and event: /api/events/track
+  Email : /api/email/target
 - Run rails db:create db:migrate
 - Run rails server
