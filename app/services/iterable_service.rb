@@ -11,13 +11,12 @@ class IterableService
     begin
       response = post_request(@api_key, body, email_target_url)
       if response.code == 200
-        puts "Email sent successfully!"
+        return "Email Notification sent"
       else
-        handle_failed_email_send(response)
+        return "Email Notification failed: #{response.code}"
       end
-
     rescue StandardError => e
-      puts "Error sending email: #{e.message}"
+      return "Email Notification failed: #{e.message}"
     end
   end
 
@@ -31,12 +30,12 @@ class IterableService
     begin
       response = post_request(@api_key, body, web_push_url)
       if response.code == 200
-        puts "#{event_type} created"
+        return "#{event_type} sent"
       else
-        handle_event_creation_failure(response)
+        return "#{event_type} Failed. Error: #{response.code}"
       end
     rescue StandardError => e
-      puts "Error Event creation: #{e.message} "
+      return "#{event_type} Failed. Error: #{e.message}"
     end
   end
 
@@ -55,11 +54,4 @@ class IterableService
     return response
   end
 
-  def self.handle_failed_email_send(response)
-    puts " response.status : #{response.code}"
-  end
-
-  def self.handle_event_creation_failure(response)
-    puts "API Request failed response.status : #{response.code} "
-  end
 end
