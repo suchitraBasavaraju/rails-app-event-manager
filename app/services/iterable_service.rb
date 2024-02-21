@@ -8,15 +8,16 @@ class IterableService
       "campaignId": 0,
       "recipientEmail": email,
     }
+
     begin
       response = post_request(@api_key, body, email_target_url)
       if response.code == 200
         return "Email Notification sent"
       else
-        return "Email Notification failed: #{response.code}"
+        raise StandardError, "#{response.code}"
       end
     rescue StandardError => e
-      return "Email Notification failed: #{e.message}"
+      raise StandardError, "Email Notification Failed,Error: #{e.message}"
     end
   end
 
@@ -32,10 +33,10 @@ class IterableService
       if response.code == 200
         return "#{event_type} sent"
       else
-        return "#{event_type} Failed. Error: #{response.code}"
+        raise StandardError, "#{response.code}"
       end
     rescue StandardError => e
-      return "#{event_type} Failed. Error: #{e.message}"
+      raise StandardError, "Event Creation Failed,Error: #{e.message}"
     end
   end
 
