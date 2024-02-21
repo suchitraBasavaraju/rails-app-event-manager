@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "EventsControllers", type: :request do
+RSpec.describe "Events request", type: :request do
 
   let(:user) { create(:user) }
   before do
@@ -9,51 +9,56 @@ RSpec.describe "EventsControllers", type: :request do
 
   describe '#create_event_a' do
     it 'creates Event A and tracks the event' do
-      allow(IterableService).to receive(:track_event).and_return("Event A tracked successfully") # Mocking IterableService
+      track_event_url = /api\/events\/track/
+      WebMock.stub_request(:post, track_event_url).to_return(status: 200, body: `{ "msg" : "Event A" }`, headers: {})
 
       post "/events/create_event_a"
 
-      expect(flash[:success]).to eq("Event A tracked successfully")
+      expect(flash[:success]).to eq("Event A sent")
     end
 
-    it 'sets error when track_event raises error' do
-      allow(IterableService).to receive(:track_event).and_raise(StandardError, 'Error message')
+    it 'Event A creation failed' do
+      track_event_url = /api\/events\/track/
+      WebMock.stub_request(:post, track_event_url).to_return(status: 400)
 
       post "/events/create_event_a"
 
-      expect(flash[:success]).to be_nil
-      expect(flash[:error]).to eq('Error message')
+      expect(flash[:error]).to eq("Event Creation Failed,Error: 400")
     end
   end
 
-  describe '#create_event_b and send email' do
-    it 'creates Event B and sends email notification successfully' do
-      allow(IterableService).to receive(:track_event).and_return("Event A tracked successfully") # Mocking IterableService
-      allow(IterableService).to receive(:send_email_notification).and_return("Email Sent successfully") # Mocking IterableService
+  describe '#create_event_b and send email event' do
+    it 'creates Event A and tracks the event' do
+      track_event_url = /api\/events\/track/
+      email_target_url = /api\/email\/target/
+      WebMock.stub_request(:post, track_event_url).to_return(status: 200, body: `{ "msg" : "Event B" }`, headers: {})
+      WebMock.stub_request(:post, email_target_url).to_return(status: 200, body: `{ "campaignId" : 0, "recipientEmail": "user@example.com" }`, headers: {})
 
       post "/events/create_event_b"
 
-      expect(flash[:success]).to eq("Event A tracked successfully - Email Sent successfully")
+      expect(flash[:success]).to eq("Event B sent - Email Notification sent")
     end
 
-    it 'sets error when event creation raises error' do
-      allow(IterableService).to receive(:track_event).and_raise(StandardError, 'event error message')
-      allow(IterableService).to receive(:send_email_notification).and_raise(StandardError, 'Email error message')
+    it 'creates Event B failed' do
+      track_event_url = /api\/events\/track/
+      email_target_url = /api\/email\/target/
+      WebMock.stub_request(:post, track_event_url).to_return(status: 400)
+      WebMock.stub_request(:post, email_target_url).to_return(status: 200, body: `{ "campaignId" : 0, "recipientEmail": "user@example.com" }`, headers: {})
 
       post "/events/create_event_b"
 
-      expect(flash[:success]).to be_nil
-      expect(flash[:error]).to eq('event error message')
+      expect(flash[:error]).to eq("Event Creation Failed,Error: 400")
     end
 
-    it 'sets error when email notification raises error' do
-      allow(IterableService).to receive(:track_event).and_return("Event A tracked successfully") # Mocking IterableService
-      allow(IterableService).to receive(:send_email_notification).and_raise(StandardError,"Email send error") # Mocking IterableService
-
+    it 'Email target failed for event B' do
+      track_event_url = /api\/events\/track/
+      email_target_url = /api\/email\/target/
+      WebMock.stub_request(:post, track_event_url).to_return(status: 200, body: `{ "msg" : "Event B" }`, headers: {})
+      WebMock.stub_request(:post, email_target_url).to_return(status: 400)
 
       post "/events/create_event_b"
 
-      expect(flash[:error]).to eq('Email send error')
+      expect(flash[:error]).to eq("Email Notification Failed,Error: 400")
     end
   end
 end
