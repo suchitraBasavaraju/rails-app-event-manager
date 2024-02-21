@@ -75,3 +75,5 @@ gem "webmock", "~> 3.20"
 gem 'httparty'
 
 gem "devise", "~> 4.9"
+
+gem "vcr", "~> 6.2"
