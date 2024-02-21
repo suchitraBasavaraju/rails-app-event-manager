@@ -1,12 +1,8 @@
 class IterableService
   include HTTParty
 
-  def initialize(url, api_key)
-    @url = url
-    @api_key = api_key
-  end
-
-  def send_email_notification(email)
+  def self.send_email_notification(email)
+    initialize
     email_target_url = "#{@url}/api/email/target"
     body = {
       "campaignId": 0,
@@ -25,7 +21,8 @@ class IterableService
     end
   end
 
-  def track_event(event_type, email)
+  def self.track_event(event_type, email)
+    initialize
     web_push_url = "#{@url}/api/events/track"
     body = {
       "email": email,
@@ -45,7 +42,12 @@ class IterableService
 
   private
 
-  def post_request(api_key, body, target_url)
+  def self.initialize
+    @url = ENV['ITERABLE_IO_URL']
+    @api_key = ENV['ITERABLE_IO_API_KEY']
+  end
+
+  def self.post_request(api_key, body, target_url)
     response = HTTParty.post(target_url, body: body.to_json, headers: {
       Authorization: " Bearer #{api_key}", 'Content-Type' => 'application/json'
     })
@@ -53,11 +55,11 @@ class IterableService
     return response
   end
 
-  def handle_failed_email_send(response)
+  def self.handle_failed_email_send(response)
     puts " response.status : #{response.code}"
   end
 
-  def handle_event_creation_failure(response)
+  def self.handle_event_creation_failure(response)
     puts "API Request failed response.status : #{response.code} "
   end
 end
