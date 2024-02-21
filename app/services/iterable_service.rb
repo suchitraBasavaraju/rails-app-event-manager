@@ -12,24 +12,52 @@ class IterableService
       "campaignId": 0,
       "recipientEmail": email,
     }
-    post_request(@api_key, body, email_target_url)
+    begin
+      response = post_request(@api_key, body, email_target_url)
+      if response.code == 200
+        puts "Email sent successfully!"
+      else
+        handle_failed_email_send(response)
+      end
+
+    rescue StandardError => e
+      puts "Error sending email: #{e.message}"
+    end
   end
 
   def web_push_event(event_type, email)
-    web_push_url = "#{@url}/api/events/trackWebPushClick"
+    web_push_url = "#{@url}/api/events/track"
     body = {
       "email": email,
-      "messageId": event_type,
+      "eventName": event_type,
     }
-    post_request(@api_key, body, web_push_url)
+    begin
+      response = post_request(@api_key, body, web_push_url)
+      if response.code == 200
+        puts "#{event_type} created"
+      else
+        handle_event_creation_failure(response)
+      end
+    rescue StandardError => e
+      puts "Error Event creation: #{e.message} "
+    end
   end
 
   private
 
-  def post_request(api_key, body, email_target_url)
-    HTTParty.post(email_target_url, body: body.to_json, headers: {
-      Authorization: "Bearer #{api_key}", 'Content-Type' => 'application/json'
+  def post_request(api_key, body, target_url)
+    response = HTTParty.post(target_url, body: body.to_json, headers: {
+      Authorization: " Bearer #{api_key}", 'Content-Type' => 'application/json'
     })
+
+    return response
   end
 
+  def handle_failed_email_send(response)
+    puts " response.status : #{response.code}"
+  end
+
+  def handle_event_creation_failure(response)
+    puts "API Request failed response.status : #{response.code} "
+  end
 end

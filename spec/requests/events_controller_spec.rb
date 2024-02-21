@@ -12,14 +12,50 @@ RSpec.describe "EventsControllers", type: :request do
   describe "POST #create_event_a" do
 
     it "creates an Event A" do
-      event_web_push_url = /api\/events\/trackWebPushClick/
+      event_web_push_url = /api\/events\/track/
       WebMock.stub_request(:post, event_web_push_url).to_return(status: 200, body: `{ "msg" : "Event A" }`, headers: {})
 
       post "/events/create_event_a"
 
       expect(WebMock).to have_requested(:post, event_web_push_url).with(
         headers: { 'Authorization' => "Bearer test-api-key", 'Content-Type' => 'application/json' },
-        body: { 'email' => "user@example.com", 'messageId' => "Event A" }
+        body: { 'email' => "user@example.com", 'eventName' => "Event A" }
+      ).once
+    end
+
+    it "Event A creation api return bad request" do
+      event_web_push_url = /api\/events\/track/
+      WebMock.stub_request(:post, event_web_push_url).to_return(status: 400, body: `{ "error" : "Event A creation" }`, headers: {})
+
+      post "/events/create_event_a"
+
+      expect(WebMock).to have_requested(:post, event_web_push_url).with(
+        headers: { 'Authorization' => "Bearer test-api-key", 'Content-Type' => 'application/json' },
+        body: { 'email' => "user@example.com", 'eventName' => "Event A" }
+      ).once
+    end
+
+    it "Event A creation api return forbidden" do
+      event_web_push_url = /api\/events\/track/
+      WebMock.stub_request(:post, event_web_push_url).to_return(status: 401, body: `{ "error" : "Invalid API Key" }`, headers: {})
+
+      post "/events/create_event_a"
+
+      expect(WebMock).to have_requested(:post, event_web_push_url).with(
+        headers: { 'Authorization' => "Bearer test-api-key", 'Content-Type' => 'application/json' },
+        body: { 'email' => "user@example.com", 'eventName' => "Event A" }
+      ).once
+    end
+
+    it "Event A creation fail for invalid api key" do
+      event_web_push_url = /api\/events\/track/
+      WebMock.stub_request(:post, event_web_push_url).to_return(status: 401)
+
+      post "/events/create_event_a"
+
+      expect(WebMock).to have_requested(:post, event_web_push_url).with(
+        headers: { 'Authorization' => "Bearer test-api-key", 'Content-Type' => 'application/json' },
+        body: { 'email' => "user@example.com", 'eventName' => "Event A" }
       ).once
     end
 
@@ -28,7 +64,7 @@ RSpec.describe "EventsControllers", type: :request do
   describe "POST #create_event_b and send email" do
 
     it "creates an Event B" do
-      event_web_push_url = /api\/events\/trackWebPushClick/
+      event_web_push_url = /api\/events\/track/
       email_send_url = /api\/email\/target/
       WebMock.stub_request(:post, event_web_push_url).to_return(status: 200, body: `{ "msg" : "Event B" }`, headers: {})
       WebMock.stub_request(:post, email_send_url).to_return(status: 200, body: `{ "campaignId" : 0, "recipientEmail": "user@example.com" }`, headers: {})
@@ -37,7 +73,7 @@ RSpec.describe "EventsControllers", type: :request do
 
       expect(WebMock).to have_requested(:post, event_web_push_url).with(
         headers: { 'Authorization' => "Bearer test-api-key", 'Content-Type' => 'application/json' },
-        body: { 'email' => "user@example.com", 'messageId' => "Event B" }
+        body: { 'email' => "user@example.com", 'eventName' => "Event B" }
       ).once
 
       expect(WebMock).to have_requested(:post, email_send_url).with(
@@ -45,6 +81,7 @@ RSpec.describe "EventsControllers", type: :request do
         body: { 'campaignId' => 0, 'recipientEmail' => 'user@example.com' }
       ).once
     end
+
   end
 
 end
