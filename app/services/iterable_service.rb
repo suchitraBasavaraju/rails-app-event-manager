@@ -47,9 +47,13 @@ class IterableService
   end
 
   def self.post_request(api_key, body, target_url)
-    response = HTTParty.post(target_url, body: body.to_json, headers: {
-      Authorization: " Bearer #{api_key}", 'Content-Type' => 'application/json'
-    })
+    response = HTTParty.post(
+      target_url,
+      body: body.to_json,
+      headers: {
+        Authorization: " Bearer #{api_key}",
+        'Content-Type' => 'application/json'
+      })
 
     return response
   end
