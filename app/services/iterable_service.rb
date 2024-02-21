@@ -25,7 +25,7 @@ class IterableService
     end
   end
 
-  def web_push_event(event_type, email)
+  def track_event(event_type, email)
     web_push_url = "#{@url}/api/events/track"
     body = {
       "email": email,
