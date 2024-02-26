@@ -35,11 +35,22 @@ RSpec.describe 'IterableService' do
   describe "create event" do
 
     it "create Event successfully" do
-      WebMock.stub_request(:post, track_event_url).to_return(status: 200, body: `{ "msg" : "Event A" }`, headers: {})
+      WebMock.stub_request(:post, track_event_url).to_return(status: 200, body: `{ "msg" : "Event A" ,"code" : "Success", "params":{}`, headers: {})
       email = "user@example.com"
 
       response = IterableService.track_event("Event A", email)
 
+      expect(WebMock).to have_requested(:post, track_event_url).with(body: { "email" => email, "eventName" => "Event A" }.to_json, headers: { 'authorization': 'Bearer 12345' })
+      expect(response).to eq("Event A sent")
+    end
+
+    it "create Event successfully" do
+      WebMock.stub_request(:post, track_event_url).to_return(status: 200, body: `{ "msg" : "Event A" ,"code" : "Success", "params":{}`, headers: {})
+      email = "user@example.com"
+
+      response = IterableService.track_event("Event A", email)
+
+      expect(WebMock).to have_requested(:post, track_event_url).with(body: { "email" => email, "eventName" => "Event A" }.to_json, headers: { 'authorization': 'Bearer 12345' })
       expect(response).to eq("Event A sent")
     end
 
