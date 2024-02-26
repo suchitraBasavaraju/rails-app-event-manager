@@ -40,7 +40,7 @@ RSpec.describe 'IterableService' do
 
       response = IterableService.track_event("Event A", email)
 
-      expect(WebMock).to have_requested(:post, track_event_url).with(body: { "email" => email, "eventName" => "Event A" }.to_json, headers: { 'authorization': 'Bearer 12345' })
+      expect(WebMock).to have_requested(:post, track_event_url).with(body: { "email" => email, "eventName" => "Event A" }.to_json, headers: { 'authorization': 'Bearer 123456' })
       expect(response).to eq("Event A sent")
     end
 
@@ -50,7 +50,7 @@ RSpec.describe 'IterableService' do
 
       response = IterableService.track_event("Event A", email)
 
-      expect(WebMock).to have_requested(:post, track_event_url).with(body: { "email" => email, "eventName" => "Event A" }.to_json, headers: { 'authorization': 'Bearer 12345' })
+      expect(WebMock).to have_requested(:post, track_event_url).with(body: { "email" => email, "eventName" => "Event A" }.to_json, headers: { 'authorization': 'Bearer 123456' })
       expect(response).to eq("Event A sent")
     end
 

@@ -11,6 +11,7 @@
 /.env*
 !/.env*.erb
 !/.env.to_set
+!/.env.test
 
 # Ignore all logfiles and tempfiles.
 /log/*
