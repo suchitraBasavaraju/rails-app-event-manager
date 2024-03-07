@@ -56,4 +56,22 @@ RSpec.describe "EventsControllers", type: :request do
       expect(flash[:error]).to eq('Email send error')
     end
   end
+
+  describe '#send email for every event' do
+    it 'should send email for event A' do
+      allow(IterableService).to receive(:send_email_notification).and_return("Email Sent successfully") # Mocking IterableService
+      allow(IterableService).to receive(:get_events).and_return({
+                                                                  "events": [
+                                                                    { name: "Event A", user_id: 1, event_type: "A" },
+                                                                    { name: "Event B", user_id: 1, event_type: "B" },
+                                                                  ]
+                                                                }) # Mocking IterableService
+
+      post "/events/send_email_for_events"
+
+      expect(IterableService).to have_received(:send_email_notification).with(user.email).twice
+      expect(flash[:success]).to eq("Email Sent successfully")
+    end
+
+  end
 end

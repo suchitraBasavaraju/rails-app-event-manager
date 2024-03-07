@@ -40,6 +40,10 @@ class IterableService
     end
   end
 
+  def self.get_events(i)
+    # code here
+  end
+
   private
 
   def self.initialize
